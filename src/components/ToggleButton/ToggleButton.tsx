@@ -1,19 +1,25 @@
 import styles from "./ToggleButton.module.scss";
 
 type ButtonProps = {
-    disabled?: boolean;
+    isDisabled?: boolean;
     isYes: boolean;
     onYesClick: () => void;
     onNoClick: () => void;
 };
 
-const ToggleButton = ({ onYesClick, onNoClick, isYes }: ButtonProps) => {
+const ToggleButton = ({
+    onYesClick,
+    onNoClick,
+    isYes,
+    isDisabled,
+}: ButtonProps) => {
     return (
         <div className={styles.Toggle}>
             <button
                 type="button"
                 className={isYes ? styles.selected : undefined}
                 onClick={() => onYesClick()}
+                disabled={isDisabled}
             >
                 Yes
             </button>
@@ -21,6 +27,7 @@ const ToggleButton = ({ onYesClick, onNoClick, isYes }: ButtonProps) => {
                 type="button"
                 className={!isYes ? styles.selected : undefined}
                 onClick={() => onNoClick()}
+                disabled={isDisabled}
             >
                 No
             </button>

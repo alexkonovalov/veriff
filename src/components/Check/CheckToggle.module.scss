@@ -1,0 +1,26 @@
+@import "~/src/variables.scss";
+
+.Check {
+    padding: 10px;
+
+    &:hover {
+        background-color: rgb(247, 245, 245);
+    }
+
+    &:focus,
+    &:focus-within {
+        background-color: $highlight-color;
+        outline: none;
+    }
+
+    .disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .description {
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+}

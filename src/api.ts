@@ -1,4 +1,6 @@
-export function fetchChecks() {
+import { Check } from "./model";
+
+export async function fetchChecks(): Promise<Check[]> {
     return new Promise((resolve, reject) =>
         setTimeout(
             () =>
@@ -37,7 +39,11 @@ export function fetchChecks() {
  * @param {string} results[].checkId - Check id
  * @param {string} results[].result - Result value (yes / no)
  */
-export function submitCheckResults(results) {
+export function submitCheckResults(
+    results: {}[],
+    checkId: string,
+    result: boolean
+) {
     return new Promise((resolve, reject) =>
         setTimeout(
             () =>
