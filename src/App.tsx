@@ -5,7 +5,7 @@ function App() {
     return (
         <div className="App">
             Hello world!
-            <Button children={"Submit"} />
+            <Button type="button">Submit</Button>
         </div>
     );
 }

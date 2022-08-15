@@ -1,19 +1,18 @@
-import PropTypes from "prop-types";
-import "./Button.css";
+import styles from "./Button.module.scss";
 
-const Button = ({ children, ...rest }: any) => {
+type ButtonProps = {
+    disabled?: boolean;
+    type: "button" | "submit" | "reset" | undefined;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    children: React.ReactNode;
+};
+
+const Button = ({ children, onClick, ...rest }: ButtonProps) => {
     return (
-        <button className="Button" {...rest}>
+        <button className={styles.Button} {...rest}>
             {children}
         </button>
     );
-};
-
-Button.propTypes = {
-    children: PropTypes.string.isRequired,
-    disabled: PropTypes.bool,
-    type: PropTypes.string,
-    onClick: PropTypes.func,
 };
 
 export default Button;

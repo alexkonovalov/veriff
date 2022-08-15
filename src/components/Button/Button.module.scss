@@ -1,3 +1,5 @@
+@import '~/src/variables.scss';
+
 .Button {
   font-weight: 500;
   font-size: 14px;
@@ -7,7 +9,7 @@
   text-align: center;
   user-select: none;
   border: 1px solid transparent;
-  background-color: var(--primary-color);
+  background-color: $primary-color;
   color: white;
 
   position: relative;
