@@ -1,13 +1,9 @@
 import "./App.scss";
 import Button from "./components/Button/Button";
+import VerifyForm from "./components/VerifyForm/VerifyForm";
 
 function App() {
-    return (
-        <div className="App">
-            Hello world!
-            <Button type="button">Submit</Button>
-        </div>
-    );
+    return <VerifyForm />;
 }
 
 export default App;
