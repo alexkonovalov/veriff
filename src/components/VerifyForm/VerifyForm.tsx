@@ -14,6 +14,10 @@ import { useEffect, useState } from "react";
 
 const VerifyForm = () => {
     const [checks, setChecks] = useState<Check[]>([]);
+    const [checkedInfo, setCheckedIx] = useState<{
+        ix: number;
+        isYes: boolean;
+    }>({ isYes: false, ix: 0 });
 
     useEffect(() => {
         fetchChecks().then((checks) => {
@@ -24,7 +28,7 @@ const VerifyForm = () => {
     return (
         <div>
             <h1>Checks</h1>
-            <div>{JSON.stringify(checks)}</div>
+            <div>checkedInfo:{JSON.stringify(checkedInfo)}</div>
             {checks.length && (
                 <Formik
                     initialValues={{ checks }}
@@ -45,32 +49,61 @@ const VerifyForm = () => {
                                         {values.checks &&
                                         values.checks.length > 0 ? (
                                             values.checks.map(
-                                                (check, index) => (
-                                                    <div key={index}>
-                                                        <Field name="lastName">
-                                                            {({
-                                                                field, // { name, value, onChange, onBlur }
-                                                                form: {
-                                                                    touched,
-                                                                    errors,
-                                                                }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                                                                meta,
-                                                            }: FieldProps<any>) => (
-                                                                <div>
-                                                                    <CheckToggle
-                                                                        isDisabled={
-                                                                            index ===
-                                                                            2
-                                                                        }
-                                                                        description={
-                                                                            check.description
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </Field>
-                                                    </div>
-                                                )
+                                                (check, index) => {
+                                                    const onCheck = (
+                                                        isYes: boolean
+                                                    ) =>
+                                                        setCheckedIx({
+                                                            ix: index,
+                                                            isYes,
+                                                        });
+                                                    const isDisabled =
+                                                        index >
+                                                        (checkedInfo.isYes
+                                                            ? checkedInfo.ix + 1
+                                                            : checkedInfo.ix);
+                                                    const isYes =
+                                                        checkedInfo.ix === index
+                                                            ? checkedInfo.isYes
+                                                            : checkedInfo.ix >
+                                                              index
+                                                            ? true
+                                                            : false;
+
+                                                    return (
+                                                        <div key={index}>
+                                                            <Field
+                                                                name={`check_${index}`}
+                                                            >
+                                                                {({
+                                                                    field, // { name, value, onChange, onBlur }
+                                                                    form: {
+                                                                        touched,
+                                                                        errors,
+                                                                    }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+                                                                    meta,
+                                                                }: FieldProps<any>) => (
+                                                                    <div>
+                                                                        <CheckToggle
+                                                                            onCheck={
+                                                                                onCheck
+                                                                            }
+                                                                            isYes={
+                                                                                isYes
+                                                                            }
+                                                                            isDisabled={
+                                                                                isDisabled
+                                                                            }
+                                                                            description={
+                                                                                check.description
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </Field>
+                                                        </div>
+                                                    );
+                                                }
                                             )
                                         ) : (
                                             <button
