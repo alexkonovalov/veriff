@@ -8,27 +8,68 @@ import {
 } from "formik";
 import Button from "../Button/Button";
 import CheckToggle from "../Check/CheckToggle";
-import { fetchChecks } from "../../api";
+import { fetchChecks, submitCheckResults } from "../../api";
 import { Check } from "../../model";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ToggleField } from "./ToggleField";
+import useRoveFocus from "../../hooks/useRoveFocus";
+import useKeyPrompt from "../../hooks/useKeyPrompt";
 
 const VerifyForm = () => {
     const [checks, setChecks] = useState<Check[]>([]);
-    const [checkedInfo, setCheckedIx] = useState<{
-        ix: number;
+    const [checkedInfo, setCheckedInfo] = useState<{
         isYes: boolean;
-    }>({ isYes: false, ix: 0 });
+    }>({ isYes: false });
 
     useEffect(() => {
         fetchChecks().then((checks) => {
             setChecks(checks);
         });
-    }, []);
+    }, [fetchChecks, setChecks]);
+
+    const setChecked = useCallback(
+        (isCheck: boolean) => {
+            setCheckedInfo({ isYes: isCheck });
+        },
+        [setCheckedInfo]
+    );
+
+    const uncheck = useCallback(() => {
+        setCheckedInfo({ isYes: false });
+    }, [setCheckedInfo]);
+
+    const check = useCallback(() => {
+        setCheckedInfo({ isYes: true });
+    }, [setCheckedInfo]);
+
+    const { currentFocus, setCurrentFocus } = useRoveFocus(
+        checks.length,
+        !checkedInfo.isYes,
+        uncheck,
+        check
+    );
+
+    useKeyPrompt({ yesKey: "1", noKey: "2", updateCallback: setChecked });
+
+    const isSubmitEnabled = useMemo(
+        () => !checkedInfo.isYes || currentFocus === checks.length - 1,
+        [checkedInfo.isYes, currentFocus, checks.length]
+    );
+
+    const selectCheck = useCallback(
+        (value: { ix: number; isYes: boolean }) => {
+            setCurrentFocus(value.ix);
+            setCheckedInfo(value);
+        },
+        [setCheckedInfo, setCurrentFocus]
+    );
 
     return (
         <div>
-            <h1>Checks</h1>
-            <div>checkedInfo:{JSON.stringify(checkedInfo)}</div>
+            <h1 id="lada">Checks</h1>
+            <div>
+                Focus:{currentFocus} :: {checkedInfo.isYes ? "y" : "n"}
+            </div>
             {checks.length && (
                 <Formik
                     initialValues={{ checks }}
@@ -40,84 +81,36 @@ const VerifyForm = () => {
                             }, 800);
                         });
                     }}
-                    render={({ values }) => (
+                    render={({ values, isValid }) => (
                         <Form>
                             <FieldArray
                                 name="checks"
-                                render={(arrayHelpers) => (
+                                render={() => (
                                     <div>
                                         {values.checks &&
-                                        values.checks.length > 0 ? (
+                                            values.checks.length > 0 &&
                                             values.checks.map(
-                                                (check, index) => {
-                                                    const onCheck = (
-                                                        isYes: boolean
-                                                    ) =>
-                                                        setCheckedIx({
-                                                            ix: index,
-                                                            isYes,
-                                                        });
-                                                    const isDisabled =
-                                                        index >
-                                                        (checkedInfo.isYes
-                                                            ? checkedInfo.ix + 1
-                                                            : checkedInfo.ix);
-                                                    const isYes =
-                                                        checkedInfo.ix === index
-                                                            ? checkedInfo.isYes
-                                                            : checkedInfo.ix >
-                                                              index
-                                                            ? true
-                                                            : false;
-
-                                                    return (
-                                                        <div key={index}>
-                                                            <Field
-                                                                name={`check_${index}`}
-                                                            >
-                                                                {({
-                                                                    field, // { name, value, onChange, onBlur }
-                                                                    form: {
-                                                                        touched,
-                                                                        errors,
-                                                                    }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                                                                    meta,
-                                                                }: FieldProps<any>) => (
-                                                                    <div>
-                                                                        <CheckToggle
-                                                                            onCheck={
-                                                                                onCheck
-                                                                            }
-                                                                            isYes={
-                                                                                isYes
-                                                                            }
-                                                                            isDisabled={
-                                                                                isDisabled
-                                                                            }
-                                                                            description={
-                                                                                check.description
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                            </Field>
-                                                        </div>
-                                                    );
-                                                }
-                                            )
-                                        ) : (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    arrayHelpers.push("")
-                                                }
-                                            >
-                                                {/* show this when user has removed all friends from the list */}
-                                                Add a friend
-                                            </button>
-                                        )}
+                                                (check, index) => (
+                                                    <ToggleField
+                                                        key={index}
+                                                        focusedIx={currentFocus}
+                                                        index={index}
+                                                        check={check}
+                                                        setCheckedIx={
+                                                            selectCheck
+                                                        }
+                                                        isCheckedYes={
+                                                            checkedInfo.isYes
+                                                        }
+                                                        checkedIx={currentFocus}
+                                                    />
+                                                )
+                                            )}
                                         <div>
-                                            <Button type="submit">
+                                            <Button
+                                                type="submit"
+                                                disabled={!isSubmitEnabled}
+                                            >
                                                 Submit
                                             </Button>
                                         </div>
