@@ -1,9 +1,12 @@
-import "./App.scss";
-import Button from "./components/Button/Button";
-import VerifyForm from "./components/VerifyForm/VerifyForm";
+import styles from "./App.module.scss";
+import { Verification } from "./components/Verification/Verification";
 
 function App() {
-    return <VerifyForm />;
+    return (
+        <div className={styles.App}>
+            <Verification />
+        </div>
+    );
 }
 
 export default App;

@@ -39,16 +39,12 @@ export async function fetchChecks(): Promise<Check[]> {
  * @param {string} results[].checkId - Check id
  * @param {string} results[].result - Result value (yes / no)
  */
-export function submitCheckResults(
-    results: {}[],
-    checkId: string,
-    result: boolean
-) {
+export function submitCheckResults(checkId: string, result: boolean) {
     return new Promise((resolve, reject) =>
         setTimeout(
             () =>
                 Math.random() <= 0.8
-                    ? resolve(results)
+                    ? resolve({ checkId, result })
                     : reject({ success: false }),
             500
         )

@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { Check } from "../../model";
 import CheckToggle from "../Check/CheckToggle";
 

@@ -3,6 +3,10 @@
 .Check {
     padding: 10px;
 
+    .Description {
+        padding-bottom: 5px;
+    }
+
     &:hover {
         background-color: rgb(247, 245, 245);
     }
@@ -13,10 +17,10 @@
         outline: none;
     }
 
-    .disabled {
+    &.Disabled {
         opacity: 0.3;
-        pointer-events: none;
         user-select: none;
+        pointer-events: none;
     }
 
     .description {

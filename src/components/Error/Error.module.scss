@@ -1,0 +1,11 @@
+@import "~/src/variables.scss";
+
+.Cross {
+    &:after {
+        display: inline-block;
+        content: "\00d7";
+        margin: 30px;
+        color: #ff0000;
+        font-size: xxx-large;
+    }
+}

@@ -1,44 +1,51 @@
 @import "~/src/variables.scss";
 
 .Toggle {
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 0.4px;
-    text-align: center;
-    user-select: none;
-    border: 1px solid transparent;
-    border-color: $primary-color;
-    color: $primary-color;
-    background-color: white;
+    button {
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.4px;
+        text-align: center;
+        user-select: none;
+        border: 1px solid transparent;
+        border-color: $primary-color;
+        color: $primary-color;
+        background-color: white;
 
-    position: relative;
-    padding: 5px 16px;
-    cursor: pointer;
+        position: relative;
+        padding: 5px 16px;
+        cursor: pointer;
 
-    button::first-child {
-        border-top-left-radius: 3px;
-        border-bottom-left-radius: 3px;
-        border-right: 0px;
-    }
+        &:first-child {
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            border-right: 0px;
+        }
 
-    button::last-child {
-        border-top-right-radius: 3px;
-        border-bottom-right-radius: 3px;
-    }
+        &:last-child {
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+        }
+        &:disabled {
+            background-color: #e6ebf4;
+            color: #bdc0cf;
+            cursor: not-allowed;
+        }
 
-    button:disabled {
-        background-color: #e6ebf4;
-        color: #bdc0cf;
-        cursor: not-allowed;
-    }
+        &:enabled:hover,
+        &:enabled:focus {
+            filter: brightness(110%);
+        }
 
-    button:enabled:hover,
-    button:enabled:focus {
-        filter: brightness(110%);
-    }
+        &.selected {
+            background-color: $primary-color;
+            color: white;
 
-    .selected {
-        background-color: $primary-color;
-        color: white;
+            &:disabled {
+                background-color: #e6ebf4;
+                color: #bdc0cf;
+                cursor: not-allowed;
+            }
+        }
     }
 }

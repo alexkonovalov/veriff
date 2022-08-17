@@ -1,18 +1,12 @@
 import styles from "./Button.module.scss";
 
-type ButtonProps = {
-    disabled?: boolean;
-    type: "button" | "submit" | "reset" | undefined;
-    onClick?: React.MouseEventHandler<HTMLButtonElement>;
-    children: React.ReactNode;
-};
+type ButtonProps = React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+>;
 
-const Button = ({ children, onClick, ...rest }: ButtonProps) => {
-    return (
-        <button className={styles.Button} {...rest}>
-            {children}
-        </button>
-    );
-};
+const Button = ({ className, ...rest }: ButtonProps) => (
+    <button className={`${className} ${styles.Button}`} {...rest} />
+);
 
 export default Button;

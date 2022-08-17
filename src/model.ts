@@ -3,3 +3,11 @@ export type Check = {
     priority: number;
     description: string;
 };
+
+export enum FormStatusEnum {
+    initial,
+    interactive,
+    success,
+    loading,
+    error,
+}

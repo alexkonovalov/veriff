@@ -1,0 +1,32 @@
+@import "~/src/variables.scss";
+
+.Tick {
+    margin-bottom: 30px;
+    margin-top: 30px;
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    &:before {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 50%;
+        width: 6px;
+        background-color: $primary-color;
+        content: "";
+        transform: translateX(10px) rotate(-45deg);
+        transform-origin: left bottom;
+    }
+    &:after {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 6px;
+        width: 100%;
+        background-color: $primary-color;
+        content: "";
+        transform: translateX(10px) rotate(-45deg);
+        transform-origin: left bottom;
+    }
+}

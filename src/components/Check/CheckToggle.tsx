@@ -21,15 +21,21 @@ const CheckToggle = ({
     tabIx,
 }: CheckToggleProps) => {
     const ref = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         isSelected && ref?.current?.focus();
     }, [isSelected]);
 
     const onYes = useCallback(() => onCheck(true), []);
     const onNo = useCallback(() => onCheck(false), []);
+
     return (
-        <div className={styles.Check} tabIndex={tabIx} ref={ref}>
-            {description}
+        <div
+            className={`${styles.Check} ${isDisabled ? styles.Disabled : ""}`}
+            tabIndex={tabIx}
+            ref={ref}
+        >
+            <div className={styles.Description}>{description}</div>
             <ToggleButton
                 isYes={isYes}
                 isDisabled={isDisabled}
