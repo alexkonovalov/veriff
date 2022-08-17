@@ -1,4 +1,3 @@
-import { Field, FieldProps } from "formik";
 import { useEffect, useRef } from "react";
 import { Check } from "../../model";
 import CheckToggle from "../Check/CheckToggle";
@@ -33,21 +32,13 @@ export const ToggleField = ({
         checkedIx === index ? isCheckedYes : checkedIx > index ? true : false;
 
     return (
-        <Field name={`check_${index}`} id={"ll" + index}>
-            {({
-                field, // { name, value, onChange, onBlur }
-                form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
-                meta,
-            }: FieldProps<any>) => (
-                <CheckToggle
-                    onCheck={onCheck}
-                    isSelected={isSelected}
-                    isYes={isYes}
-                    tabIx={index}
-                    isDisabled={isDisabled}
-                    description={check.description}
-                />
-            )}
-        </Field>
+        <CheckToggle
+            onCheck={onCheck}
+            isSelected={isSelected}
+            isYes={isYes}
+            tabIx={index}
+            isDisabled={isDisabled}
+            description={check.description}
+        />
     );
 };

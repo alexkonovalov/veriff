@@ -1,11 +1,3 @@
-import {
-    Formik,
-    Form,
-    Field,
-    ErrorMessage,
-    FieldArray,
-    FieldProps,
-} from "formik";
 import Button from "../Button/Button";
 import CheckToggle from "../Check/CheckToggle";
 import { fetchChecks, submitCheckResults } from "../../api";
@@ -70,57 +62,25 @@ const VerifyForm = () => {
             <div>
                 Focus:{currentFocus} :: {checkedInfo.isYes ? "y" : "n"}
             </div>
-            {checks.length && (
-                <Formik
-                    initialValues={{ checks }}
-                    onSubmit={(values) => {
-                        return new Promise(function (resolve, reject) {
-                            setTimeout(function () {
-                                alert(JSON.stringify(values, null, 2));
-                                resolve("");
-                            }, 800);
-                        });
-                    }}
-                    render={({ values, isValid }) => (
-                        <Form>
-                            <FieldArray
-                                name="checks"
-                                render={() => (
-                                    <div>
-                                        {values.checks &&
-                                            values.checks.length > 0 &&
-                                            values.checks.map(
-                                                (check, index) => (
-                                                    <ToggleField
-                                                        key={index}
-                                                        focusedIx={currentFocus}
-                                                        index={index}
-                                                        check={check}
-                                                        setCheckedIx={
-                                                            selectCheck
-                                                        }
-                                                        isCheckedYes={
-                                                            checkedInfo.isYes
-                                                        }
-                                                        checkedIx={currentFocus}
-                                                    />
-                                                )
-                                            )}
-                                        <div>
-                                            <Button
-                                                type="submit"
-                                                disabled={!isSubmitEnabled}
-                                            >
-                                                Submit
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                            />
-                        </Form>
-                    )}
-                />
-            )}
+            <div>
+                {checks.length &&
+                    checks.map((check, index) => (
+                        <ToggleField
+                            key={index}
+                            focusedIx={currentFocus}
+                            index={index}
+                            check={check}
+                            setCheckedIx={selectCheck}
+                            isCheckedYes={checkedInfo.isYes}
+                            checkedIx={currentFocus}
+                        />
+                    ))}
+                <div>
+                    <Button type="submit" disabled={!isSubmitEnabled}>
+                        Submit
+                    </Button>
+                </div>
+            </div>
         </div>
     );
 };
