@@ -1,38 +1,39 @@
+import { ButtonStatusEnum } from "../../model";
 import styles from "./ToggleButton.module.scss";
 
 type ButtonProps = {
     isDisabled?: boolean;
-    isYes: boolean;
+    status: ButtonStatusEnum;
     onYesClick: () => void;
     onNoClick: () => void;
 };
 
-const ToggleButton = ({
+export const ToggleButton = ({
     onYesClick,
     onNoClick,
-    isYes,
+    status,
     isDisabled,
-}: ButtonProps) => {
-    return (
-        <div className={styles.Toggle}>
-            <button
-                type="button"
-                className={isYes ? styles.selected : undefined}
-                onClick={() => onYesClick()}
-                disabled={isDisabled}
-            >
-                Yes
-            </button>
-            <button
-                type="button"
-                className={!isYes ? styles.selected : undefined}
-                onClick={() => onNoClick()}
-                disabled={isDisabled}
-            >
-                No
-            </button>
-        </div>
-    );
-};
-
-export default ToggleButton;
+}: ButtonProps) => (
+    <div className={styles.Toggle}>
+        <button
+            type="button"
+            className={
+                status == ButtonStatusEnum.yes ? styles.selected : undefined
+            }
+            onClick={() => onYesClick()}
+            disabled={isDisabled}
+        >
+            Yes
+        </button>
+        <button
+            type="button"
+            className={
+                status == ButtonStatusEnum.no ? styles.selected : undefined
+            }
+            onClick={() => onNoClick()}
+            disabled={isDisabled}
+        >
+            No
+        </button>
+    </div>
+);

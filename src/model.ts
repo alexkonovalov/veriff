@@ -11,3 +11,9 @@ export enum FormStatusEnum {
     loading,
     error,
 }
+
+export enum ButtonStatusEnum {
+    yes,
+    no,
+    empty,
+}

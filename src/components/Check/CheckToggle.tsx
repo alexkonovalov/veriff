@@ -1,24 +1,28 @@
-import { isDisabled } from "@testing-library/user-event/dist/utils";
 import { useCallback, useEffect, useRef } from "react";
-import ToggleButton from "../ToggleButton/ToggleButton";
+import { ButtonStatusEnum } from "../../model";
+import { ToggleButton } from "../ToggleButton/ToggleButton";
 import styles from "./CheckToggle.module.scss";
 
 export type CheckToggleProps = {
     description: string;
-    isYes: boolean;
-    onCheck: (isYes: boolean) => void;
+    onCheckIx: (ix: number) => void;
+    onUncheckIx: (ix: number) => void;
     isDisabled?: boolean;
     isSelected?: boolean;
+    status: ButtonStatusEnum;
     tabIx: number;
+    ix: number;
 };
 
 const CheckToggle = ({
     description,
     isDisabled,
     isSelected,
-    isYes,
-    onCheck: onCheck,
+    onCheckIx,
+    onUncheckIx,
+    status,
     tabIx,
+    ix,
 }: CheckToggleProps) => {
     const ref = useRef<HTMLDivElement>(null);
 
@@ -26,8 +30,13 @@ const CheckToggle = ({
         isSelected && ref?.current?.focus();
     }, [isSelected]);
 
-    const onYes = useCallback(() => onCheck(true), []);
-    const onNo = useCallback(() => onCheck(false), []);
+    const onYes = useCallback(() => {
+        onCheckIx(ix);
+    }, [onCheckIx, ix]);
+
+    const onNo = useCallback(() => {
+        onUncheckIx(ix);
+    }, [onUncheckIx, ix]);
 
     return (
         <div
@@ -37,7 +46,7 @@ const CheckToggle = ({
         >
             <div className={styles.Description}>{description}</div>
             <ToggleButton
-                isYes={isYes}
+                status={status}
                 isDisabled={isDisabled}
                 onYesClick={onYes}
                 onNoClick={onNo}

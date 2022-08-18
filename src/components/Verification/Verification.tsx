@@ -1,13 +1,10 @@
 import Button from "../Button/Button";
 import CheckToggle from "../Check/CheckToggle";
 import { fetchChecks, submitCheckResults } from "../../api";
-import { Check, FormStatusEnum } from "../../model";
+import { ButtonStatusEnum, Check, FormStatusEnum } from "../../model";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { ToggleField } from "./ToggleField";
 import useRoveFocus from "../../hooks/useRoveFocus";
 import useKeyPrompt from "../../hooks/useKeyPrompt";
-import { match } from "assert";
-
 import styles from "./Verification.module.scss";
 import { Loader } from "../Loader/Loader";
 import { Error } from "../Error/Error";
@@ -21,8 +18,9 @@ export const Verification = () => {
     );
 
     const [checkedInfo, setCheckedInfo] = useState<{
-        isYes: boolean;
-    }>({ isYes: false });
+        status: ButtonStatusEnum;
+        checkedIx: number;
+    }>({ status: ButtonStatusEnum.empty, checkedIx: 0 });
 
     useEffect(() => {
         setFormStatus(FormStatusEnum.loading);
@@ -36,35 +34,47 @@ export const Verification = () => {
             });
     }, [fetchChecks, setChecks]);
 
-    const setChecked = useCallback(
-        (isCheck: boolean) => {
-            setCheckedInfo({ isYes: isCheck });
+    const { currentFocusIx } = useRoveFocus(
+        checks.length,
+        checkedInfo.status === ButtonStatusEnum.no
+            ? checkedInfo.checkedIx
+            : checkedInfo.checkedIx + 1
+    );
+
+    const onUncheckIx = useCallback(
+        (ix: number) => {
+            setCheckedInfo({
+                status: ButtonStatusEnum.no,
+                checkedIx: ix,
+            });
         },
         [setCheckedInfo]
     );
 
-    const uncheck = useCallback(() => {
-        setCheckedInfo({ isYes: false });
-    }, [setCheckedInfo]);
-
-    const check = useCallback(() => {
-        setCheckedInfo({ isYes: true });
-    }, [setCheckedInfo]);
-
-    const { currentFocus, setCurrentFocus } = useRoveFocus(
-        checks.length,
-        !checkedInfo.isYes,
-        uncheck,
-        check
+    const onCheckIx = useCallback(
+        (ix: number) => {
+            setCheckedInfo({
+                status: ButtonStatusEnum.yes,
+                checkedIx: ix,
+            });
+        },
+        [setCheckedInfo]
     );
 
-    const submit = useCallback(
+    const onFocusCheck = useCallback(
+        (isCheck: boolean) =>
+            (isCheck ? onCheckIx : onUncheckIx)(currentFocusIx),
+        [currentFocusIx, onCheckIx, onUncheckIx]
+    );
+
+    const onSubmit = useCallback(
         (e: FormEvent<HTMLFormElement> | KeyboardEvent) => {
-            console.log("submit");
             setFormStatus(FormStatusEnum.loading);
-            submitCheckResults(`${currentFocus}`, checkedInfo.isYes)
+            submitCheckResults(
+                `${currentFocusIx}`,
+                checkedInfo.status === ButtonStatusEnum.yes
+            )
                 .then((result) => {
-                    console.log("result", result);
                     setFormStatus(FormStatusEnum.success);
                 })
                 .catch(() => {
@@ -72,51 +82,63 @@ export const Verification = () => {
                 });
             e.preventDefault();
         },
-        []
+        [submitCheckResults, setFormStatus]
     );
 
-    useKeyPrompt({ yesKey: "1", noKey: "2", updateCallback: setChecked });
+    useKeyPrompt({
+        yesKey: "1",
+        noKey: "2",
+        updateCallback: onFocusCheck,
+    });
 
     const isSubmitEnabled = useMemo(
-        () => !checkedInfo.isYes || currentFocus === checks.length - 1,
-        [checkedInfo.isYes, currentFocus, checks.length]
+        () =>
+            checkedInfo.status !== ButtonStatusEnum.yes ||
+            checkedInfo.checkedIx === checks.length - 1,
+        [checkedInfo.status, checkedInfo.checkedIx, checks.length]
     );
 
     const handleEnter = useCallback(
         (e: KeyboardEvent) =>
             e.key === "Enter" &&
-            (isSubmitEnabled ? submit(e) : e.preventDefault()),
-        [isSubmitEnabled, submit]
+            (isSubmitEnabled ? onSubmit(e) : e.preventDefault()),
+        [isSubmitEnabled, onSubmit]
     );
 
     useKeydown(handleEnter);
 
-    const selectCheck = useCallback(
-        (value: { ix: number; isYes: boolean }) => {
-            setCurrentFocus(value.ix);
-            setCheckedInfo(value);
-        },
-        [setCheckedInfo, setCurrentFocus]
-    );
-
     return (
         <div className={styles.Verification}>
-            {/* <h1 id="lada">Checks : submit {submitStatus} </h1>
-            <div>
-                Focus:{currentFocus} :: {checkedInfo.isYes ? "y" : "n"}
+            {/* <div>
+                Focus:{currentFocusIx} | status: {checkedInfo.status} | checked{" "}
+                {checks.length - 1}
+                {checkedInfo.checkedIx}
             </div> */}
             {formStatus === FormStatusEnum.interactive && (
-                <form onSubmit={submit} className={styles.Form}>
+                <form onSubmit={onSubmit} className={styles.Form}>
                     {checks.length &&
                         checks.map((check, index) => (
-                            <ToggleField
+                            <CheckToggle
                                 key={index}
-                                focusedIx={currentFocus}
-                                index={index}
-                                check={check}
-                                setCheckedIx={selectCheck}
-                                isCheckedYes={checkedInfo.isYes}
-                                checkedIx={currentFocus}
+                                ix={index}
+                                tabIx={index}
+                                status={
+                                    checkedInfo.checkedIx === index
+                                        ? checkedInfo.status
+                                        : checkedInfo.checkedIx > index
+                                        ? ButtonStatusEnum.yes
+                                        : ButtonStatusEnum.empty
+                                }
+                                isSelected={currentFocusIx === index}
+                                isDisabled={
+                                    index >
+                                    (checkedInfo.status === ButtonStatusEnum.yes
+                                        ? checkedInfo.checkedIx + 1
+                                        : checkedInfo.checkedIx)
+                                }
+                                description={check.description}
+                                onUncheckIx={onUncheckIx}
+                                onCheckIx={onCheckIx}
                             />
                         ))}
 
