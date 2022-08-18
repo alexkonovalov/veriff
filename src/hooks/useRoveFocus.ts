@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useKeydown } from "./useKeydown";
 
 function useRoveFocus(size: number, limitIx: number) {
@@ -18,7 +18,7 @@ function useRoveFocus(size: number, limitIx: number) {
                 currentFocusIx !== 0 && setCurrentFocus(currentFocusIx - 1);
             }
         },
-        [size, currentFocusIx, setCurrentFocus, currentFocusIx === limitIx]
+        [size, currentFocusIx, setCurrentFocus, limitIx]
     );
 
     useKeydown(handleKeyDown);
