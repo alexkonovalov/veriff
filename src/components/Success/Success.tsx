@@ -4,7 +4,9 @@ export const Success = () => {
     return (
         <>
             <div className={styles.Tick}></div>
-            <div>Congrats! Your form has been submitted!</div>
+            <div data-testid="success_screen">
+                Congrats! Your form has been submitted!
+            </div>
         </>
     );
 };

@@ -5,15 +5,15 @@ export type Check = {
 };
 
 export enum FormStatusEnum {
-    initial,
-    interactive,
-    success,
-    loading,
-    error,
+    Initial,
+    Interactive,
+    Success,
+    Loading,
+    Error,
 }
 
 export enum ButtonStatusEnum {
-    yes,
-    no,
-    empty,
+    Yes,
+    No,
+    Empty,
 }

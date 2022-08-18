@@ -4,6 +4,7 @@ import { Verification } from "./components/Verification/Verification";
 function App() {
     return (
         <div className={styles.App}>
+            <div></div>
             <Verification />
         </div>
     );

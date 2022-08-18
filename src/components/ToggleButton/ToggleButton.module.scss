@@ -2,10 +2,8 @@
 
 .Toggle {
     button {
-        font-weight: 500;
         font-size: 14px;
         letter-spacing: 0.4px;
-        text-align: center;
         user-select: none;
         border: 1px solid transparent;
         border-color: $primary-color;
@@ -30,11 +28,6 @@
             background-color: #e6ebf4;
             color: #bdc0cf;
             cursor: not-allowed;
-        }
-
-        &:enabled:hover,
-        &:enabled:focus {
-            filter: brightness(110%);
         }
 
         &.selected {

@@ -1,5 +1,5 @@
 import styles from "./Loader.module.scss";
 
 export const Loader = () => {
-    return <div className={styles.Loader}></div>;
+    return <div data-testid="loader" className={styles.Loader}></div>;
 };

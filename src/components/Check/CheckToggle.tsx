@@ -5,19 +5,21 @@ import styles from "./CheckToggle.module.scss";
 
 export type CheckToggleProps = {
     description: string;
+    id: string;
     onCheckIx: (ix: number) => void;
     onUncheckIx: (ix: number) => void;
     isDisabled?: boolean;
-    isSelected?: boolean;
+    isFocused?: boolean;
     status: ButtonStatusEnum;
     tabIx: number;
     ix: number;
 };
 
-const CheckToggle = ({
+export const CheckToggle = ({
     description,
+    id,
     isDisabled,
-    isSelected,
+    isFocused,
     onCheckIx,
     onUncheckIx,
     status,
@@ -27,8 +29,8 @@ const CheckToggle = ({
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        isSelected && ref?.current?.focus();
-    }, [isSelected]);
+        isFocused && ref?.current?.focus();
+    }, [isFocused]);
 
     const onYes = useCallback(() => {
         onCheckIx(ix);
@@ -43,10 +45,12 @@ const CheckToggle = ({
             className={`${styles.Check} ${isDisabled ? styles.Disabled : ""}`}
             tabIndex={tabIx}
             ref={ref}
+            data-testid={`check_${id}`}
         >
             <div className={styles.Description}>{description}</div>
             <ToggleButton
                 status={status}
+                id={id}
                 isDisabled={isDisabled}
                 onYesClick={onYes}
                 onNoClick={onNo}
@@ -54,5 +58,3 @@ const CheckToggle = ({
         </div>
     );
 };
-
-export default CheckToggle;

@@ -1,42 +1,42 @@
-import Button from "../Button/Button";
-import CheckToggle from "../Check/CheckToggle";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "../Button/Button";
+import { CheckToggle } from "../Check/CheckToggle";
 import { fetchChecks, submitCheckResults } from "../../api";
 import { ButtonStatusEnum, Check, FormStatusEnum } from "../../model";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import useRoveFocus from "../../hooks/useRoveFocus";
-import useKeyPrompt from "../../hooks/useKeyPrompt";
-import styles from "./Verification.module.scss";
 import { Loader } from "../Loader/Loader";
 import { Error } from "../Error/Error";
 import { Success } from "../Success/Success";
 import { useKeydown } from "../../hooks/useKeydown";
+import useRoveFocus from "../../hooks/useRoveFocus";
+import useKeyPrompt from "../../hooks/useKeyPrompt";
+import styles from "./Verification.module.scss";
 
 export const Verification = () => {
     const [checks, setChecks] = useState<Check[]>([]);
     const [formStatus, setFormStatus] = useState<FormStatusEnum>(
-        FormStatusEnum.initial
+        FormStatusEnum.Initial
     );
 
     const [checkedInfo, setCheckedInfo] = useState<{
         status: ButtonStatusEnum;
         checkedIx: number;
-    }>({ status: ButtonStatusEnum.empty, checkedIx: 0 });
+    }>({ status: ButtonStatusEnum.Empty, checkedIx: 0 });
 
     useEffect(() => {
-        setFormStatus(FormStatusEnum.loading);
+        setFormStatus(FormStatusEnum.Loading);
         fetchChecks()
             .then((checks) => {
-                setChecks(checks);
-                setFormStatus(FormStatusEnum.interactive);
+                setChecks(checks.sort((a, b) => a.priority - b.priority));
+                setFormStatus(FormStatusEnum.Interactive);
             })
             .catch(() => {
-                setFormStatus(FormStatusEnum.error);
+                setFormStatus(FormStatusEnum.Error);
             });
     }, [fetchChecks, setChecks]);
 
     const { currentFocusIx } = useRoveFocus(
         checks.length,
-        checkedInfo.status === ButtonStatusEnum.no
+        checkedInfo.status === ButtonStatusEnum.No
             ? checkedInfo.checkedIx
             : checkedInfo.checkedIx + 1
     );
@@ -44,7 +44,7 @@ export const Verification = () => {
     const onUncheckIx = useCallback(
         (ix: number) => {
             setCheckedInfo({
-                status: ButtonStatusEnum.no,
+                status: ButtonStatusEnum.No,
                 checkedIx: ix,
             });
         },
@@ -54,7 +54,7 @@ export const Verification = () => {
     const onCheckIx = useCallback(
         (ix: number) => {
             setCheckedInfo({
-                status: ButtonStatusEnum.yes,
+                status: ButtonStatusEnum.Yes,
                 checkedIx: ix,
             });
         },
@@ -69,20 +69,21 @@ export const Verification = () => {
 
     const onSubmit = useCallback(
         (e: FormEvent<HTMLFormElement> | KeyboardEvent) => {
-            setFormStatus(FormStatusEnum.loading);
+            setFormStatus(FormStatusEnum.Loading);
+
             submitCheckResults(
-                `${currentFocusIx}`,
-                checkedInfo.status === ButtonStatusEnum.yes
+                checks[currentFocusIx].id,
+                checkedInfo.status === ButtonStatusEnum.Yes
             )
-                .then((result) => {
-                    setFormStatus(FormStatusEnum.success);
+                .then(() => {
+                    setFormStatus(FormStatusEnum.Success);
                 })
                 .catch(() => {
-                    setFormStatus(FormStatusEnum.error);
+                    setFormStatus(FormStatusEnum.Error);
                 });
             e.preventDefault();
         },
-        [submitCheckResults, setFormStatus]
+        [submitCheckResults, setFormStatus, checks, currentFocusIx, checkedInfo]
     );
 
     useKeyPrompt({
@@ -93,7 +94,7 @@ export const Verification = () => {
 
     const isSubmitEnabled = useMemo(
         () =>
-            checkedInfo.status !== ButtonStatusEnum.yes ||
+            checkedInfo.status === ButtonStatusEnum.No ||
             checkedInfo.checkedIx === checks.length - 1,
         [checkedInfo.status, checkedInfo.checkedIx, checks.length]
     );
@@ -108,31 +109,31 @@ export const Verification = () => {
     useKeydown(handleEnter);
 
     return (
-        <div className={styles.Verification}>
-            {/* <div>
-                Focus:{currentFocusIx} | status: {checkedInfo.status} | checked{" "}
-                {checks.length - 1}
-                {checkedInfo.checkedIx}
-            </div> */}
-            {formStatus === FormStatusEnum.interactive && (
-                <form onSubmit={onSubmit} className={styles.Form}>
+        <div className={styles.Verification} data-testid="verification_form">
+            {formStatus === FormStatusEnum.Interactive && (
+                <form
+                    onSubmit={onSubmit}
+                    className={styles.Form}
+                    data-testid="checks_form"
+                >
                     {checks.length &&
                         checks.map((check, index) => (
                             <CheckToggle
                                 key={index}
+                                id={check.id}
                                 ix={index}
                                 tabIx={index}
                                 status={
                                     checkedInfo.checkedIx === index
                                         ? checkedInfo.status
                                         : checkedInfo.checkedIx > index
-                                        ? ButtonStatusEnum.yes
-                                        : ButtonStatusEnum.empty
+                                        ? ButtonStatusEnum.Yes
+                                        : ButtonStatusEnum.Empty
                                 }
-                                isSelected={currentFocusIx === index}
+                                isFocused={currentFocusIx === index}
                                 isDisabled={
                                     index >
-                                    (checkedInfo.status === ButtonStatusEnum.yes
+                                    (checkedInfo.status === ButtonStatusEnum.Yes
                                         ? checkedInfo.checkedIx + 1
                                         : checkedInfo.checkedIx)
                                 }
@@ -146,14 +147,15 @@ export const Verification = () => {
                         className={styles.SubmitButton}
                         type="submit"
                         disabled={!isSubmitEnabled}
+                        data-testid="button_submit"
                     >
                         Submit
                     </Button>
                 </form>
             )}
-            {formStatus === FormStatusEnum.success && <Success />}
-            {formStatus === FormStatusEnum.loading && <Loader />}
-            {formStatus === FormStatusEnum.error && <Error />}
+            {formStatus === FormStatusEnum.Success && <Success />}
+            {formStatus === FormStatusEnum.Loading && <Loader />}
+            {formStatus === FormStatusEnum.Error && <Error />}
         </div>
     );
 };

@@ -5,8 +5,6 @@ type ButtonProps = React.DetailedHTMLProps<
     HTMLButtonElement
 >;
 
-const Button = ({ className, ...rest }: ButtonProps) => (
+export const Button = ({ className, ...rest }: ButtonProps) => (
     <button className={`${className} ${styles.Button}`} {...rest} />
 );
-
-export default Button;

@@ -4,7 +4,9 @@ export const Error = () => {
     return (
         <>
             <div className={styles.Cross}></div>
-            <div>Oops! Something went wrong :(</div>
+            <div data-testid="error_description">
+                Oops! Something went wrong :(
+            </div>
         </>
     );
 };
