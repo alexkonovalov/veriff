@@ -12,6 +12,7 @@ import styles from "./Verification.module.scss";
 import { Loader } from "../Loader/Loader";
 import { Error } from "../Error/Error";
 import { Success } from "../Success/Success";
+import { useKeydown } from "../../hooks/useKeydown";
 
 export const Verification = () => {
     const [checks, setChecks] = useState<Check[]>([]);
@@ -57,19 +58,22 @@ export const Verification = () => {
         check
     );
 
-    const submit = useCallback((e: FormEvent<HTMLFormElement>) => {
-        console.log("submit");
-        setFormStatus(FormStatusEnum.loading);
-        submitCheckResults(`${currentFocus}`, checkedInfo.isYes)
-            .then((result) => {
-                console.log("result", result);
-                setFormStatus(FormStatusEnum.success);
-            })
-            .catch(() => {
-                setFormStatus(FormStatusEnum.error);
-            });
-        e.preventDefault();
-    }, []);
+    const submit = useCallback(
+        (e: FormEvent<HTMLFormElement> | KeyboardEvent) => {
+            console.log("submit");
+            setFormStatus(FormStatusEnum.loading);
+            submitCheckResults(`${currentFocus}`, checkedInfo.isYes)
+                .then((result) => {
+                    console.log("result", result);
+                    setFormStatus(FormStatusEnum.success);
+                })
+                .catch(() => {
+                    setFormStatus(FormStatusEnum.error);
+                });
+            e.preventDefault();
+        },
+        []
+    );
 
     useKeyPrompt({ yesKey: "1", noKey: "2", updateCallback: setChecked });
 
@@ -77,6 +81,15 @@ export const Verification = () => {
         () => !checkedInfo.isYes || currentFocus === checks.length - 1,
         [checkedInfo.isYes, currentFocus, checks.length]
     );
+
+    const handleEnter = useCallback(
+        (e: KeyboardEvent) =>
+            e.key === "Enter" &&
+            (isSubmitEnabled ? submit(e) : e.preventDefault()),
+        [isSubmitEnabled, submit]
+    );
+
+    useKeydown(handleEnter);
 
     const selectCheck = useCallback(
         (value: { ix: number; isYes: boolean }) => {
